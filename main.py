@@ -18,18 +18,18 @@ progress_text = document["progress-text"]
 hud_messages = document["hud-messages"]
 canvas_bg = document["canvas-bg"]
 
-# Levels Definition with Themes
+# Configuração de Níveis com tipos explícitos para o linter
 levels = [
-    {"id": 1, "theme": "Floresta Sombria", "vel": 6, "bg1": "#0B1A0B", "bg2": "#142E14", "p_color": "#44FF44", "obs_color": "#CD853F", "length": 6000},
-    {"id": 2, "theme": "Ruínas do Deserto", "vel": 7, "bg1": "#2B1A04", "bg2": "#402705", "p_color": "#FFC04C", "obs_color": "#E64A19", "length": 8000},
-    {"id": 3, "theme": "Oceano Profundo", "vel": 7.5, "bg1": "#001026", "bg2": "#00204A", "p_color": "#00FFFF", "obs_color": "#FF00AA", "length": 10000},
-    {"id": 4, "theme": "Caverna de Lava", "vel": 8, "bg1": "#260000", "bg2": "#4A0000", "p_color": "#FF3300", "obs_color": "#FFFF00", "length": 12000},
-    {"id": 5, "theme": "Cidade Cyberneo", "vel": 8.5, "bg1": "#12002B", "bg2": "#2C0052", "p_color": "#FF00FF", "obs_color": "#00FFFF", "length": 14000},
-    {"id": 6, "theme": "Tundra Gelada", "vel": 9, "bg1": "#002233", "bg2": "#0A3D59", "p_color": "#E0FFFF", "obs_color": "#0055FF", "length": 16000},
-    {"id": 7, "theme": "Pântano Tóxico", "vel": 9.5, "bg1": "#1A2209", "bg2": "#293A0D", "p_color": "#BFFF00", "obs_color": "#800080", "length": 18000},
-    {"id": 8, "theme": "Caverna de Cristal", "vel": 10, "bg1": "#330022", "bg2": "#550033", "p_color": "#FF66B2", "obs_color": "#00FFFF", "length": 20000},
-    {"id": 9, "theme": "Galáxia Sombria", "vel": 11, "bg1": "#050011", "bg2": "#110022", "p_color": "#FFFFFF", "obs_color": "#FF0000", "length": 22000},
-    {"id": 10, "theme": "Núcleo Glitch", "vel": 12, "bg1": "#000000", "bg2": "#110000", "p_color": "#FF0000", "obs_color": "#FFFFFF", "length": 25000}
+    {"id": 1, "theme": "Floresta Sombria", "vel": 6.0, "bg1": "#0B1A0B", "bg2": "#142E14", "p_color": "#44FF44", "obs_color": "#CD853F", "length": 6000.0},
+    {"id": 2, "theme": "Ruínas do Deserto", "vel": 7.0, "bg1": "#2B1A04", "bg2": "#402705", "p_color": "#FFC04C", "obs_color": "#E64A19", "length": 8000.0},
+    {"id": 3, "theme": "Oceano Profundo", "vel": 7.5, "bg1": "#001026", "bg2": "#00204A", "p_color": "#00FFFF", "obs_color": "#FF00AA", "length": 10000.0},
+    {"id": 4, "theme": "Caverna de Lava", "vel": 8.0, "bg1": "#260000", "bg2": "#4A0000", "p_color": "#FF3300", "obs_color": "#FFFF00", "length": 12000.0},
+    {"id": 5, "theme": "Cidade Cyberneo", "vel": 8.5, "bg1": "#12002B", "bg2": "#2C0052", "p_color": "#FF00FF", "obs_color": "#00FFFF", "length": 14000.0},
+    {"id": 6, "theme": "Tundra Gelada", "vel": 9.0, "bg1": "#002233", "bg2": "#0A3D59", "p_color": "#E0FFFF", "obs_color": "#0055FF", "length": 16000.0},
+    {"id": 7, "theme": "Pântano Tóxico", "vel": 9.5, "bg1": "#1A2209", "bg2": "#293A0D", "p_color": "#BFFF00", "obs_color": "#800080", "length": 18000.0},
+    {"id": 8, "theme": "Caverna de Cristal", "vel": 10.0, "bg1": "#330022", "bg2": "#550033", "p_color": "#FF66B2", "obs_color": "#00FFFF", "length": 20000.0},
+    {"id": 9, "theme": "Galáxia Sombria", "vel": 11.0, "bg1": "#050011", "bg2": "#110022", "p_color": "#FFFFFF", "obs_color": "#FF0000", "length": 22000.0},
+    {"id": 10, "theme": "Núcleo Glitch", "vel": 12.0, "bg1": "#000000", "bg2": "#110000", "p_color": "#FF0000", "obs_color": "#FFFFFF", "length": 25000.0}
 ]
 
 class AudioSystem:
@@ -125,6 +125,15 @@ class Player:
         ctx.fillRect(-self.w/2, -self.h/2, self.w, self.h)
         ctx.restore()
 
+class Obstacle:
+    def __init__(self, type_name, x, y, w, h):
+        self.type = str(type_name)
+        self.x = float(x)
+        self.y = float(y)
+        self.w = float(w)
+        self.h = float(h)
+        self.captured = False
+
 class GameState:
     def __init__(self):
         self.unlocked_levels = 1
@@ -133,46 +142,52 @@ class GameState:
         self.distance = 0.0
         self.checkpoint = 0.0
         self.is_running = False
-        self.obstacles = []
+        self.obstacles = [] # Lista de objetos Obstacle
         self.particles = []
         self.bg_particles = []
         self.audio = AudioSystem()
         self.speed_boost = 0.0
         self.speed_boost_timer = 0
         
+        # Atributos de cache para evitar lookups de dicionário inseguros no linter
+        self.lvl_vel = 0.0
+        self.lvl_length = 0.0
+        self.lvl_p_color = "#FFF"
+        self.lvl_obs_color = "#FFF"
+        
         self.player = Player()
 
     def generate_obstacles(self):
         self.obstacles = []
-        base_spacing = 450 - (float(self.level_data["vel"]) * 10)
-        curr_x = 800
+        base_spacing = 450.0 - (self.lvl_vel * 10.0)
+        curr_x = 800.0
         
-        while curr_x < float(self.level_data["length"]):
-            spacing = max(float(base_spacing), 180.0)
+        while curr_x < self.lvl_length:
+            spacing = max(base_spacing, 180.0)
             
             # Decide o padrao do bloco gerado
             rand = random.random()
             
             # Forçar checkpoint a cada ~2500 px
             if int(curr_x) % 2500 < int(spacing):
-                self.obstacles.append({"type": "checkpoint", "x": float(curr_x), "y": 320.0, "w": 20.0, "h": 20.0, "captured": False})
+                self.obstacles.append(Obstacle("checkpoint", curr_x, 320.0, 20.0, 20.0))
             elif rand < 0.15:
                 # Pad Jump + Armadilha no alto ou no chão
-                self.obstacles.append({"type": "pad_jump", "x": float(curr_x), "y": 385.0, "w": 40.0, "h": 15.0})
-                self.obstacles.append({"type": "spike", "x": float(curr_x) + 250.0, "y": 370.0, "w": 30.0, "h": 30.0})
-                self.obstacles.append({"type": "spike", "x": float(curr_x) + 280.0, "y": 370.0, "w": 30.0, "h": 30.0})
-                curr_x += 350
+                self.obstacles.append(Obstacle("pad_jump", curr_x, 385.0, 40.0, 15.0))
+                self.obstacles.append(Obstacle("spike", curr_x + 250.0, 370.0, 30.0, 30.0))
+                self.obstacles.append(Obstacle("spike", curr_x + 280.0, 370.0, 30.0, 30.0))
+                curr_x += 350.0
             elif rand < 0.25:
                 # Speed Boost / Dash Plate
-                self.obstacles.append({"type": "pad_speed", "x": float(curr_x), "y": 385.0, "w": 40.0, "h": 15.0})
+                self.obstacles.append(Obstacle("pad_speed", curr_x, 385.0, 40.0, 15.0))
             elif rand < 0.6:
                 # Spikes triplos ou duplos
                 count = random.choice([2, 3])
                 for i in range(count):
-                    self.obstacles.append({"type": "spike", "x": float(curr_x) + (i * 30.0), "y": 370.0, "w": 30.0, "h": 30.0})
+                    self.obstacles.append(Obstacle("spike", curr_x + (float(i) * 30.0), 370.0, 30.0, 30.0))
             else:
                 # Spike simples e isolado
-                self.obstacles.append({"type": "spike", "x": float(curr_x), "y": 370.0, "w": 30.0, "h": 30.0})
+                self.obstacles.append(Obstacle("spike", curr_x, 370.0, 30.0, 30.0))
                 
             curr_x += random.uniform(spacing, spacing * 2.2)
 
@@ -190,16 +205,16 @@ def init_bg_particles():
     state.bg_particles = []
     # Cria particulas decorativas
     for _ in range(30):
-        state.bg_particles.append(Particle(random.uniform(0, 800), random.uniform(0, 400), state.level_data["p_color"], is_bg=True))
+        state.bg_particles.append(Particle(random.uniform(0.0, 800.0), random.uniform(0.0, 400.0), state.lvl_p_color, is_bg=True))
 
 def draw_hud():
-    prog_pct = (state.distance / state.level_data["length"]) * 100
-    if prog_pct > 100: prog_pct = 100
+    prog_pct = (state.distance / state.lvl_length) * 100.0
+    if prog_pct > 100.0: prog_pct = 100.0
     progress_bar.style.width = f"{prog_pct}%"
     progress_text.innerHTML = f"{int(prog_pct)}%"
     
     # Cores fixas HUD
-    hud_level_theme.style.color = state.level_data["p_color"]
+    hud_level_theme.style.color = state.lvl_p_color
     hud_level.style.color = "#FFF"
 
 # Render Drawers
@@ -257,14 +272,14 @@ def update(*args):
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     
     # Progressão Gradativa Local
-    vel_increase = float(state.distance) / 2500.0  
-    dynamic_vel = float(state.level_data["vel"]) + vel_increase + float(state.speed_boost)
+    vel_increase = state.distance / 2500.0  
+    dynamic_vel = state.lvl_vel + vel_increase + state.speed_boost
     
     # Processa timer de boost
     if state.speed_boost_timer > 0:
         state.speed_boost_timer -= 1
         if state.speed_boost_timer <= 0:
-            state.speed_boost = 0
+            state.speed_boost = 0.0
     
     state.distance += dynamic_vel
     
@@ -282,73 +297,60 @@ def update(*args):
     state.player.update()
     
     # Rastro visual do Player 
-    if not state.player.on_ground or state.speed_boost > 0:
-        state.particles.append(Particle(state.player.x + state.player.w/2, state.player.y + state.player.h, state.level_data["p_color"]))
+    if not state.player.on_ground or state.speed_boost > 0.0:
+        state.particles.append(Particle(state.player.x + state.player.w/2.0, state.player.y + state.player.h, state.lvl_p_color))
     
-    for p in state.particles[:]:
-        p.update()
-        if p.life <= 0:
-            state.particles.remove(p)
+    for ptc in list(state.particles):
+        ptc.update()
+        if ptc.life <= 0:
+            state.particles.remove(ptc)
         else:
-            p.draw()
+            ptc.draw()
             
     # Traçar Player final
-    state.player.draw(state.level_data["p_color"])
+    state.player.draw(state.lvl_p_color)
     
     # Renderizador de Obstaculos Complexos
     for obs in state.obstacles:
-        rel_x = obs["x"] - state.distance
-        # Verifica visibilidade e colisao O(n) na tela
-        if rel_x < 850 and rel_x > -100:
-            t = obs["type"]
-            y = obs["y"]
-            w = obs["w"]
-            h = obs["h"]
-            
+        rel_x = obs.x - state.distance
+        # Verifica visibilidade e colisao
+        if 850.0 > rel_x > -100.0:
             p = state.player
             
-            if t == "spike":
-                draw_spike(rel_x, y + h, w, h, state.level_data["obs_color"])
-                
-                # AABB Hitbox - Reduzida nas bordas para jogo justo
-                if (p.x < rel_x + w - 8 and 
-                    p.x + p.w > rel_x + 8 and 
-                    p.y < y + h and 
-                    p.y + p.h > y + 8):
+            if obs.type == "spike":
+                draw_spike(rel_x, obs.y + obs.h, obs.w, obs.h, state.lvl_obs_color)
+                # AABB Hitbox
+                if (p.x < rel_x + obs.w - 8.0 and p.x + p.w > rel_x + 8.0 and 
+                    p.y < obs.y + obs.h and p.y + p.h > obs.y + 8.0):
                     die()
                     return
             
-            elif t == "pad_jump":
-                draw_pad_jump(rel_x, y + h, w, h)
-                
-                # AABB Hitbox para propulsao
-                if p.y + p.h >= y and p.x + p.w > rel_x and p.x < rel_x + w:
+            elif obs.type == "pad_jump":
+                draw_pad_jump(rel_x, obs.y + obs.h, obs.w, obs.h)
+                if p.y + p.h >= obs.y and p.x + p.w > rel_x and p.x < rel_x + obs.w:
                     state.player.pad_jump()
             
-            elif t == "pad_speed":
-                draw_pad_speed(rel_x, y + h, w, h)
-                
-                if p.x + p.w > rel_x and p.x < rel_x + w and p.y + p.h >= y - h:
-                    if state.speed_boost == 0:
-                        state.speed_boost = 6
-                        state.speed_boost_timer = 120 # Dura +- 2 segundos focado (60fps)
+            elif obs.type == "pad_speed":
+                draw_pad_speed(rel_x, obs.y + obs.h, obs.w, obs.h)
+                if p.x + p.w > rel_x and p.x < rel_x + obs.w and p.y + p.h >= obs.y - obs.h:
+                    if state.speed_boost <= 0.0:
+                        state.speed_boost = 6.0
+                        state.speed_boost_timer = 120
                         show_hud_message("DASH OVERDRIVE!", "#00FF00")
             
-            elif t == "checkpoint":
-                if not obs["captured"]:
-                    draw_checkpoint(float(rel_x) + float(w)/2.0, float(y), "#00FF66")
-                
-                # Colisao fantasma no eixo X para ativar checkpoint
-                if float(rel_x) < float(p.x) and not obs["captured"]:
-                    state.checkpoint = float(obs["x"]) - 250.0
-                    obs["captured"] = True
+            elif obs.type == "checkpoint":
+                if not obs.captured:
+                    draw_checkpoint(rel_x + obs.w/2.0, obs.y, "#00FF66")
+                if rel_x < p.x and not obs.captured:
+                    state.checkpoint = obs.x - 250.0
+                    obs.captured = True
                     show_hud_message("CHECKPOINT", "#00FF66")
 
     # Finaliza quadro da HUD interativa
     draw_hud()
     
     # Checar Vitoria Final
-    if state.distance >= state.level_data["length"]:
+    if state.distance >= state.lvl_length:
         win_level()
         return
 
@@ -369,10 +371,10 @@ def die():
 
 def restart_from_checkpoint():
     canvas.style.opacity = "1"
-    state.distance = state.checkpoint
+    state.distance = float(state.checkpoint)
     state.particles = []
-    state.player.y = 370
-    state.player.y_vel = 0
+    state.player.y = 370.0
+    state.player.y_vel = 0.0
     state.player.on_ground = True
     start_level(state.current_level, resume=True)
 
@@ -389,14 +391,21 @@ def win_level():
 
 def start_level(idx, resume=False):
     state.current_level = idx
-    state.level_data = levels[idx]
+    lvl = levels[idx]
+    state.level_data = lvl
+    
+    # Cache de tipos para o linter
+    state.lvl_vel = float(lvl["vel"])
+    state.lvl_length = float(lvl["length"])
+    state.lvl_p_color = str(lvl["p_color"])
+    state.lvl_obs_color = str(lvl["obs_color"])
     
     # Configura Dados da HUD
-    hud_level.innerHTML = f"Fase {state.level_data['id']}"
-    hud_level_theme.innerHTML = f"» {state.level_data['theme']} «"
+    hud_level.innerHTML = f"Fase {lvl['id']}"
+    hud_level_theme.innerHTML = f"» {lvl['theme']} «"
     
     # Troca de Tema Dinâmica no Fundo! 
-    bg_gradient = f"linear-gradient(135deg, {state.level_data['bg1']} 0%, {state.level_data['bg2']} 100%)"
+    bg_gradient = f"linear-gradient(135deg, {lvl['bg1']} 0%, {lvl['bg2']} 100%)"
     canvas_bg.style.background = bg_gradient
     
     if not resume:
