@@ -331,6 +331,7 @@ def run_intro():
         if intro_step >= len(intro_sentences):
             intro_text.innerHTML = "Clique para Começar"
             intro_text.style.cursor = "pointer"
+            intro_screen.style.opacity = "1"
             def begin(ev):
                 intro_text.unbind("click", begin)
                 transition_screen("Prepare-se...", start_game_loop)
