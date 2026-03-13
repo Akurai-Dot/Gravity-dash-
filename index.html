@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Gravity Dash</title>
+    <!-- Brython Core -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.12.0/brython.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.12.0/brython_stdlib.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body onload="brython()">
+    <!-- Intro Overlay -->
+    <div id="intro-screen">
+        <h1 id="intro-text"></h1>
+    </div>
+
+    <!-- UI Overlay (HUD and Progress Bar) -->
+    <div id="game-ui" style="display: none;">
+        <div id="hud-level">Level: 1</div>
+        <div id="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+    </div>
+
+    <!-- Game Canvas -->
+    <div id="canvas-container">
+        <canvas id="gameCanvas" width="800" height="400" style="display: none;"></canvas>
+    </div>
+
+    <!-- Main Logic -->
+    <script type="text/python" src="main.py"></script>
+</body>
+</html>

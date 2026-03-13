@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #000;
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#intro-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    text-align: center;
+    transition: opacity 1s ease-in-out;
+}
+
+#intro-text {
+    font-size: 3rem;
+    white-space: pre-wrap;
+    text-shadow: 0 0 10px #00D2FF, 0 0 20px #00D2FF;
+    animation: pulse 2s infinite alternate;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
+}
+
+#game-ui {
+    position: absolute;
+    top: 20px;
+    width: 800px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    pointer-events: none;
+}
+
+#hud-level {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-shadow: 0 0 8px #00D2FF;
+}
+
+#progress-container {
+    width: 400px;
+    height: 18px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    border: 2px solid rgba(255,255,255,0.5);
+    overflow: hidden;
+    box-shadow: 0 0 5px #fff;
+}
+
+#progress-bar {
+    width: 0%;
+    height: 100%;
+    background-color: #00D2FF;
+    border-radius: 8px;
+    box-shadow: 0 0 15px #00D2FF, inset 0 0 5px #fff;
+    transition: width 0.1s linear;
+}
+
+#canvas-container {
+    position: relative;
+}
+
+canvas {
+    border: 3px solid #333;
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(0, 210, 255, 0.3);
+    background-color: #000;
+}
