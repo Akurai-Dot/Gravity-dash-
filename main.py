@@ -463,9 +463,9 @@ def open_map_screen():
 # Apresentação Inicial (Intro)
 intro_step = 0
 intro_sentences = [
-    "Bem-vindo à Nova Era",
-    "Gravity Dash Thematic",
-    "Prepare-se para o Maior Desafio..."
+    "Eric productions\napresenta...",
+    "Gravity Dash",
+    "Projeto escolar\nEtec MSA"
 ]
 
 def run_intro():
@@ -477,15 +477,18 @@ def run_intro():
         global intro_step
         if intro_step >= len(intro_sentences):
             intro_screen.style.opacity = "0"
-            timer.set_timeout(open_map_screen, 1000)
+            def go_to_map():
+                intro_screen.style.display = "none"
+                open_map_screen()
+            timer.set_timeout(go_to_map, 1000)
             return
             
         intro_text.innerHTML = intro_sentences[intro_step]
         intro_screen.style.opacity = "1"
         
         def fade():
-            intro_screen.style.opacity = "0"
             global intro_step
+            intro_screen.style.opacity = "0"
             intro_step += 1
             timer.set_timeout(show_sentence, 800)
             
