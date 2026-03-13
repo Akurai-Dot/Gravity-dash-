@@ -143,17 +143,18 @@ class GameState:
         self.checkpoint = 0.0
         self.is_running = False
         self.obstacles = [] # Lista de objetos Obstacle
+        
+        # Atributos de cache para o linter
+        self.lvl_vel = 0.0
+        self.lvl_length = 0.0
+        self.lvl_p_color = "#FFF"
+        self.lvl_obs_color = "#FFF"
+        
         self.particles = []
         self.bg_particles = []
         self.audio = AudioSystem()
         self.speed_boost = 0.0
         self.speed_boost_timer = 0
-        
-        # Atributos de cache para evitar lookups de dicionário inseguros no linter
-        self.lvl_vel = 0.0
-        self.lvl_length = 0.0
-        self.lvl_p_color = "#FFF"
-        self.lvl_obs_color = "#FFF"
         
         self.player = Player()
 
@@ -427,7 +428,7 @@ def start_level(idx, resume=False):
     canvas.style.display = "block"
     game_ui.style.display = "flex"
     
-    state.audio.play(state.level_data["id"])
+    state.audio.play(lvl["id"])
     state.is_running = True
     window.requestAnimationFrame(update)
 
