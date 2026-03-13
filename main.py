@@ -300,10 +300,11 @@ def update(*args):
     if not state.player.on_ground or state.speed_boost > 0.0:
         state.particles.append(Particle(state.player.x + state.player.w/2.0, state.player.y + state.player.h, state.lvl_p_color))
     
-    for ptc in list(state.particles):
+    for idx in range(len(state.particles) - 1, -1, -1):
+        ptc = state.particles[idx]
         ptc.update()
         if ptc.life <= 0:
-            state.particles.remove(ptc)
+            state.particles.pop(idx)
         else:
             ptc.draw()
             
@@ -410,9 +411,9 @@ def start_level(idx, resume=False):
     
     if not resume:
         # Reseta variaveis da tentativa
-        state.distance = 0
-        state.checkpoint = 0
-        state.speed_boost = 0
+        state.distance = 0.0
+        state.checkpoint = 0.0
+        state.speed_boost = 0.0
         state.speed_boost_timer = 0
         state.particles = []
         state.generate_obstacles()
