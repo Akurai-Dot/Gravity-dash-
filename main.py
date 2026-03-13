@@ -80,15 +80,15 @@ class Particle:
 
 class Player:
     def __init__(self):
-        self.x = 100
-        self.y = 370
-        self.w = 30
-        self.h = 30
-        self.y_vel = 0
+        self.x = 100.0
+        self.y = 370.0
+        self.w = 30.0
+        self.h = 30.0
+        self.y_vel = 0.0
         self.gravity = 1.0
-        self.jump_power = -13
+        self.jump_power = -13.0
         self.on_ground = True
-        self.rotation = 0
+        self.rotation = 0.0
 
     def jump(self):
         if self.on_ground:
@@ -101,15 +101,15 @@ class Player:
         show_hud_message("SUPER PULO!", "#00FFFF")
 
     def update(self):
-        self.y_vel += self.gravity
-        self.y += self.y_vel
+        self.y_vel += float(self.gravity)
+        self.y += float(self.y_vel)
 
         # Floor bounds
         if self.y >= 370:
             self.y = 370
             self.y_vel = 0
             self.on_ground = True
-            self.rotation = round(self.rotation / 90) * 90
+            self.rotation = int(round(self.rotation / 90) * 90)
         else:
             self.rotation += 6
 
@@ -130,50 +130,49 @@ class GameState:
         self.unlocked_levels = 1
         self.current_level = 0
         self.level_data = levels[0]
-        self.distance = 0
-        self.checkpoint = 0
+        self.distance = 0.0
+        self.checkpoint = 0.0
         self.is_running = False
         self.obstacles = []
         self.particles = []
         self.bg_particles = []
         self.audio = AudioSystem()
-        self.speed_boost = 0
+        self.speed_boost = 0.0
         self.speed_boost_timer = 0
         
         self.player = Player()
 
     def generate_obstacles(self):
         self.obstacles = []
-        base_spacing = 450 - (self.level_data["vel"] * 10)
+        base_spacing = 450 - (float(self.level_data["vel"]) * 10)
         curr_x = 800
         
-        while curr_x < self.level_data["length"]:
-            spacing = max(base_spacing, 180)
+        while curr_x < float(self.level_data["length"]):
+            spacing = max(float(base_spacing), 180.0)
             
             # Decide o padrao do bloco gerado
             rand = random.random()
             
             # Forçar checkpoint a cada ~2500 px
             if int(curr_x) % 2500 < int(spacing):
-                self.obstacles.append({"type": "checkpoint", "x": curr_x, "y": 320, "w": 20, "h": 20, "captured": False})
+                self.obstacles.append({"type": "checkpoint", "x": float(curr_x), "y": 320.0, "w": 20.0, "h": 20.0, "captured": False})
             elif rand < 0.15:
                 # Pad Jump + Armadilha no alto ou no chão
-                self.obstacles.append({"type": "pad_jump", "x": curr_x, "y": 385, "w": 40, "h": 15})
-                # Depois que pular é obrigado a flutuar porque tem espetos no chao logo apos
-                self.obstacles.append({"type": "spike", "x": curr_x + 250, "y": 370, "w": 30, "h": 30})
-                self.obstacles.append({"type": "spike", "x": curr_x + 280, "y": 370, "w": 30, "h": 30})
+                self.obstacles.append({"type": "pad_jump", "x": float(curr_x), "y": 385.0, "w": 40.0, "h": 15.0})
+                self.obstacles.append({"type": "spike", "x": float(curr_x) + 250.0, "y": 370.0, "w": 30.0, "h": 30.0})
+                self.obstacles.append({"type": "spike", "x": float(curr_x) + 280.0, "y": 370.0, "w": 30.0, "h": 30.0})
                 curr_x += 350
             elif rand < 0.25:
                 # Speed Boost / Dash Plate
-                self.obstacles.append({"type": "pad_speed", "x": curr_x, "y": 385, "w": 40, "h": 15})
+                self.obstacles.append({"type": "pad_speed", "x": float(curr_x), "y": 385.0, "w": 40.0, "h": 15.0})
             elif rand < 0.6:
                 # Spikes triplos ou duplos
                 count = random.choice([2, 3])
                 for i in range(count):
-                    self.obstacles.append({"type": "spike", "x": curr_x + (i * 30), "y": 370, "w": 30, "h": 30})
+                    self.obstacles.append({"type": "spike", "x": float(curr_x) + (i * 30.0), "y": 370.0, "w": 30.0, "h": 30.0})
             else:
                 # Spike simples e isolado
-                self.obstacles.append({"type": "spike", "x": curr_x, "y": 370, "w": 30, "h": 30})
+                self.obstacles.append({"type": "spike", "x": float(curr_x), "y": 370.0, "w": 30.0, "h": 30.0})
                 
             curr_x += random.uniform(spacing, spacing * 2.2)
 
@@ -257,9 +256,9 @@ def update(*args):
         
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     
-    # Progressão Gradativa Local (A velocidade base cresce conforme a distancia aumenta + boosts)
-    vel_increase = state.distance / 2500.0  
-    dynamic_vel = state.level_data["vel"] + vel_increase + state.speed_boost
+    # Progressão Gradativa Local
+    vel_increase = float(state.distance) / 2500.0  
+    dynamic_vel = float(state.level_data["vel"]) + vel_increase + float(state.speed_boost)
     
     # Processa timer de boost
     if state.speed_boost_timer > 0:
@@ -337,11 +336,11 @@ def update(*args):
             
             elif t == "checkpoint":
                 if not obs["captured"]:
-                    draw_checkpoint(rel_x + w/2, y, "#00FF66")
+                    draw_checkpoint(float(rel_x) + float(w)/2.0, float(y), "#00FF66")
                 
                 # Colisao fantasma no eixo X para ativar checkpoint
-                if rel_x < p.x and not obs["captured"]:
-                    state.checkpoint = obs["x"] - 250
+                if float(rel_x) < float(p.x) and not obs["captured"]:
+                    state.checkpoint = float(obs["x"]) - 250.0
                     obs["captured"] = True
                     show_hud_message("CHECKPOINT", "#00FF66")
 
