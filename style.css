@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
 
 body {
     margin: 0;
     padding: 0;
-    background-color: #000;
+    background-color: #050510;
     color: #fff;
     font-family: 'Orbitron', sans-serif;
     display: flex;
@@ -35,54 +35,208 @@ body {
     animation: pulse 2s infinite alternate;
 }
 
-@keyframes pulse {
-    0% { transform: scale(1); }
-    100% { transform: scale(1.05); }
+/* Map Screen */
+#map-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at center, #111 0%, #000 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 90;
+    transition: opacity 1s ease-in-out;
 }
 
+#map-screen h2 {
+    font-size: 3rem;
+    margin-bottom: 50px;
+    letter-spacing: 5px;
+    text-shadow: 0 0 15px #FF00FF, 0 0 30px #00FFFF;
+}
+
+#map-nodes {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 800px;
+}
+
+.map-node {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #222;
+    border: 3px solid #555;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.map-node.unlocked {
+    background-color: #004400;
+    border-color: #00FF00;
+    color: #00FF00;
+    text-shadow: 0 0 5px #00FF00;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+}
+
+.map-node.unlocked:hover {
+    transform: scale(1.15);
+    background-color: #00AA00;
+    color: #FFF;
+}
+
+.map-node.locked {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* HUD System */
 #game-ui {
     position: absolute;
     top: 20px;
     width: 800px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
     z-index: 10;
     pointer-events: none;
 }
 
+.hud-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.level-info {
+    display: flex;
+    flex-direction: column;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 10px 20px;
+    border-radius: 10px;
+    border-left: 4px solid #fff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+}
+
+#hud-level-theme {
+    font-size: 1rem;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
 #hud-level {
     font-size: 1.8rem;
-    font-weight: bold;
-    text-shadow: 0 0 8px #00D2FF;
+    font-weight: 900;
+    text-shadow: 0 0 10px #fff;
+}
+
+.progress-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
 #progress-container {
-    width: 400px;
-    height: 18px;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    border: 2px solid rgba(255,255,255,0.5);
+    width: 300px;
+    height: 25px;
+    background-color: rgba(20, 20, 20, 0.8);
+    border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.3);
+    position: relative;
     overflow: hidden;
-    box-shadow: 0 0 5px #fff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
 }
 
 #progress-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 0%;
     height: 100%;
-    background-color: #00D2FF;
-    border-radius: 8px;
-    box-shadow: 0 0 15px #00D2FF, inset 0 0 5px #fff;
-    transition: width 0.1s linear;
+    background: linear-gradient(90deg, #00D2FF, #00FFD2);
+    border-radius: 10px;
+    transition: width 0.05s linear;
+}
+
+#progress-glow {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 100%;
+    background: white;
+    filter: blur(5px);
+    opacity: 0.8;
+}
+
+#progress-text {
+    margin-top: 5px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-shadow: 0 0 5px #00D2FF;
+}
+
+#hud-messages {
+    position: absolute;
+    top: 150px;
+    width: 100%;
+    text-align: center;
+    font-size: 3rem;
+    font-weight: 900;
+    color: #FFF;
+    text-shadow: 0 0 20px #FFF, 0 0 40px #FFF;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    transform: scale(0.5);
+}
+
+.message-active {
+    opacity: 1 !important;
+    transform: scale(1.2) !important;
 }
 
 #canvas-container {
     position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
 }
 
 canvas {
-    border: 3px solid #333;
+    border: 3px solid rgba(255,255,255,0.1);
     border-radius: 10px;
-    box-shadow: 0 0 30px rgba(0, 210, 255, 0.3);
-    background-color: #000;
+    background-color: transparent; 
+    z-index: 2;
+    position: relative;
+    transition: opacity 0.5s ease;
+}
+
+#canvas-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background: #000;
+    transition: background 1.5s ease;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
 }

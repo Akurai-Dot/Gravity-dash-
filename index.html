@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Gravity Dash</title>
+    <title>Gravity Dash - Thematic Edition</title>
     <!-- Brython Core -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.12.0/brython.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.12.0/brython_stdlib.min.js"></script>
@@ -14,16 +14,34 @@
         <h1 id="intro-text"></h1>
     </div>
 
-    <!-- UI Overlay (HUD and Progress Bar) -->
+    <!-- Map Selection Overlay -->
+    <div id="map-screen" style="display: none;">
+        <h2>MAPA DE FASES</h2>
+        <div id="map-nodes"></div>
+    </div>
+
+    <!-- Game HUD -->
     <div id="game-ui" style="display: none;">
-        <div id="hud-level">Level: 1</div>
-        <div id="progress-container">
-            <div id="progress-bar"></div>
+        <div class="hud-top">
+            <div class="level-info">
+                <span id="hud-level-theme">Tema</span>
+                <span id="hud-level">Nível 1</span>
+            </div>
+            <div class="progress-wrapper">
+                <div id="progress-container">
+                    <div id="progress-bar"></div>
+                    <div id="progress-glow"></div>
+                </div>
+                <span id="progress-text">0%</span>
+            </div>
         </div>
+        <div id="hud-messages"></div>
     </div>
 
     <!-- Game Canvas -->
     <div id="canvas-container">
+        <!-- Canvas Background Layer for Themes -->
+        <div id="canvas-bg"></div>
         <canvas id="gameCanvas" width="800" height="400" style="display: none;"></canvas>
     </div>
 
